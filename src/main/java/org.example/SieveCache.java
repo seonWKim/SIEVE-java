@@ -1,11 +1,10 @@
 package org.example;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class SieveCache<T> {
     private final int capacity;
-    private Map<T, SieveNode<T>> cache;
+    private final ConcurrentHashMap<T, SieveNode<T>> cache;
     private SieveNode<T> head;
     private SieveNode<T> tail;
     private SieveNode<T> hand;
@@ -13,7 +12,26 @@ public class SieveCache<T> {
 
     public SieveCache(int capacity) {
         this.capacity = capacity;
-        this.cache = new HashMap<>(capacity);
+        this.cache = new ConcurrentHashMap<>(capacity);
+    }
+
+    public void access(T value) {
+        cache.compute(value, (k, v) -> {
+            if (v != null) {
+                v.setVisited(true);
+                return v;
+            }
+
+            if (size == capacity) {
+                evict();
+            }
+
+            SieveNode<T> newSieveNode = new SieveNode<>(value);
+            addToHead(newSieveNode);
+            size++;
+
+            return newSieveNode;
+        });
     }
 
     private void addToHead(SieveNode<T> sieveNode) {
@@ -56,21 +74,6 @@ public class SieveCache<T> {
         cache.remove(obj.value());
         remove(obj);
         size--;
-    }
-
-    public void access(T value) {
-        if (cache.containsKey(value)) {
-            cache.get(value).setVisited(true);
-        } else {
-            if (size == capacity) {
-                evict();
-            }
-
-            SieveNode<T> newSieveNode = new SieveNode<>(value);
-            addToHead(newSieveNode);
-            cache.put(value, newSieveNode);
-            size++;
-        }
     }
 
     public void showCache() {
