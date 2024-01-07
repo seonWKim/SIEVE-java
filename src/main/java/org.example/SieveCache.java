@@ -1,7 +1,9 @@
+package org.example;
+
 import java.util.Map;
 
 public class SieveCache<T> {
-    private long capacity;
+    private final long capacity;
     private Map<T, Node<T>> cache;
     private Node<T> head;
     private Node<T> tail;
