@@ -73,9 +73,11 @@ public class SieveCache<T> {
 
         assert obj != null;
         hand = obj.prev() != null ? obj.prev() : null;
-        cache.remove(obj.value());
-        remove(obj);
-        size.decrementAndGet();
+        cache.computeIfPresent(obj.value(), (k, v) -> {
+            remove(v);
+            size.decrementAndGet();
+            return null;
+        });
     }
 
     public void showCache() {

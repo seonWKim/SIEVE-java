@@ -3,6 +3,7 @@ package org.example;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -48,10 +49,13 @@ class SieveTest {
 
     @Test
     void parallelExecutionStressTest() throws Exception {
-        SieveCache<Integer> cache = new SieveCache<>(100);
-        ExecutorService executor = Executors.newFixedThreadPool(5);
-        List<Callable<Void>> callables = List.of(testCallable(cache), testCallable(cache), testCallable(cache),
-                                                 testCallable(cache), testCallable(cache));
+        SieveCache<Integer> cache = new SieveCache<>(10);
+        ExecutorService executor = Executors.newFixedThreadPool(10);
+        List<Callable<Void>> callables = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            callables.add(testCallable(cache));
+        }
+        
         List<Future<Void>> futures = executor.invokeAll(callables);
         for (Future<Void> future : futures) {
             future.get();
@@ -60,9 +64,8 @@ class SieveTest {
 
     private Callable<Void> testCallable(SieveCache<Integer> cache) {
         return () -> {
-            for (int i = 0; i < 1000; i++) {
+            for (int i = 0; i < 1000000; i++) {
                 cache.access(i);
-                System.out.println(Thread.currentThread().getName());
             }
             return null;
         };
