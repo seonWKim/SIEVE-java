@@ -1,48 +1,50 @@
 package org.example;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class SieveCache<T> {
-    private final long capacity;
-    private Map<T, Node<T>> cache;
-    private Node<T> head;
-    private Node<T> tail;
-    private Node<T> hand;
+    private final int capacity;
+    private Map<T, SieveNode<T>> cache;
+    private SieveNode<T> head;
+    private SieveNode<T> tail;
+    private SieveNode<T> hand;
     private long size = 0;
 
-    public SieveCache(long capacity) {
+    public SieveCache(int capacity) {
         this.capacity = capacity;
+        this.cache = new HashMap<>(capacity);
     }
 
-    private void addToHead(Node<T> node) {
-        node.setNext(hand);
-        node.setPrev(null);
+    private void addToHead(SieveNode<T> sieveNode) {
+        sieveNode.setNext(hand);
+        sieveNode.setPrev(null);
         if (head != null) {
-            head.setPrev(node);
+            head.setPrev(sieveNode);
         }
-        head = node;
+        head = sieveNode;
         if (tail == null) {
-            tail = node;
+            tail = sieveNode;
         }
     }
 
     // This method ensures that the node exists the list of nodes
-    private void remove(Node<T> node) {
-        if (node.prev() != null) {
-            node.prev().setNext(node.next());
+    private void remove(SieveNode<T> sieveNode) {
+        if (sieveNode.prev() != null) {
+            sieveNode.prev().setNext(sieveNode.next());
         } else {
-            head = node.next();
+            head = sieveNode.next();
         }
 
-        if (node.next() != null) {
-            node.next().setPrev(node.prev());
+        if (sieveNode.next() != null) {
+            sieveNode.next().setPrev(sieveNode.prev());
         } else {
-            tail = node.prev();
+            tail = sieveNode.prev();
         }
     }
 
     public void evict() {
-        Node<T> obj = hand != null ? hand : tail;
+        SieveNode<T> obj = hand != null ? hand : tail;
 
         while (obj != null && obj.visited()) {
             obj.setVisited(false);
@@ -64,18 +66,23 @@ public class SieveCache<T> {
                 evict();
             }
 
-            Node<T> newNode = new Node<T>(value);
-            addToHead(newNode);
-            cache.put(value, newNode);
+            SieveNode<T> newSieveNode = new SieveNode<>(value);
+            addToHead(newSieveNode);
+            cache.put(value, newSieveNode);
             size++;
         }
     }
 
     public void showCache() {
-        Node<T> obj = head;
+        SieveNode<T> obj = head;
         while (obj != null) {
             System.out.print(obj.value() + " " + "(Visited: " + obj.visited() + ") ");
             obj = obj.next();
         }
+    }
+
+    // Visible for testing
+    protected boolean contains(T value) {
+        return cache.containsKey(value);
     }
 }

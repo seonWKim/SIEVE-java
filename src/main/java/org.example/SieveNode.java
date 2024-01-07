@@ -1,12 +1,12 @@
 package org.example;
 
-public class Node<T> {
+public class SieveNode<T> {
     private T value;
-    private Node<T> prev;
-    private Node<T> next;
+    private SieveNode<T> prev;
+    private SieveNode<T> next;
     private boolean visited = false;
 
-    public Node(T value) {
+    public SieveNode(T value) {
         this.value = value;
         this.prev = null;
         this.next = null;
@@ -24,19 +24,19 @@ public class Node<T> {
         this.visited = visited;
     }
 
-    public Node<T> next() {
+    public SieveNode<T> next() {
         return this.next;
     }
 
-    public void setNext(Node<T> next) {
+    public void setNext(SieveNode<T> next) {
         this.next = next;
     }
 
-    public Node<T> prev() {
+    public SieveNode<T> prev() {
         return this.prev;
     }
 
-    public void setPrev(Node<T> prev) {
+    public void setPrev(SieveNode<T> prev) {
         this.prev = prev;
     }
 }

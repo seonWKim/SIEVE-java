@@ -13,30 +13,30 @@ class Node:
 class SieveCache:
     def __init__(self, capacity):
         self.capacity = capacity
-        self.cache = {}  # To store cache items as {value: node}
+        self.cache = {}  # To store cache items as {value: sieveNode}
         self.head = None
         self.tail = None
         self.hand = None
         self.size = 0
 
-    def _add_to_head(self, node):
-        node.next = self.head
-        node.prev = None
+    def _add_to_head(self, sieveNode):
+        sieveNode.next = self.head
+        sieveNode.prev = None
         if self.head:
-            self.head.prev = node
-        self.head = node
+            self.head.prev = sieveNode
+        self.head = sieveNode
         if self.tail is None:
-            self.tail = node
+            self.tail = sieveNode
 
-    def _remove_node(self, node):
-        if node.prev:
-            node.prev.next = node.next
+    def _remove_node(self, sieveNode):
+        if sieveNode.prev:
+            sieveNode.prev.next = sieveNode.next
         else:
-            self.head = node.next
-        if node.next:
-            node.next.prev = node.prev
+            self.head = sieveNode.next
+        if sieveNode.next:
+            sieveNode.next.prev = sieveNode.prev
         else:
-            self.tail = node.prev
+            self.tail = sieveNode.prev
 
     def _evict(self):
         obj = self.hand if self.hand else self.tail
@@ -50,8 +50,8 @@ class SieveCache:
 
     def access(self, x):
         if x in self.cache:  # Cache Hit
-            node = self.cache[x]
-            node.visited = True
+            sieveNode = self.cache[x]
+            sieveNode.visited = True
         else:  # Cache Miss
             if self.size == self.capacity:  # Cache Full
                 self._evict()  # Eviction
