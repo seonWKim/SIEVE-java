@@ -1,6 +1,7 @@
 package org.example;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class SieveCache<T> {
     private final int capacity;
@@ -8,11 +9,12 @@ public class SieveCache<T> {
     private SieveNode<T> head;
     private SieveNode<T> tail;
     private SieveNode<T> hand;
-    private long size = 0;
+    private final AtomicInteger size;
 
     public SieveCache(int capacity) {
         this.capacity = capacity;
         this.cache = new ConcurrentHashMap<>(capacity);
+        this.size = new AtomicInteger(0);
     }
 
     public void access(T value) {
@@ -22,13 +24,13 @@ public class SieveCache<T> {
                 return v;
             }
 
-            if (size == capacity) {
+            if (size.get() == capacity) {
                 evict();
             }
 
             SieveNode<T> newSieveNode = new SieveNode<>(value);
             addToHead(newSieveNode);
-            size++;
+            size.incrementAndGet();
 
             return newSieveNode;
         });
@@ -73,7 +75,7 @@ public class SieveCache<T> {
         hand = obj.prev() != null ? obj.prev() : null;
         cache.remove(obj.value());
         remove(obj);
-        size--;
+        size.decrementAndGet();
     }
 
     public void showCache() {
